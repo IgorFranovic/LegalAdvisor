@@ -49,9 +49,9 @@ Once you start the app with ```docker-compose up --build``` an instance of Strea
 It utilizes Langchain to communicate with the GPT model.
 
 ```
-Example question:
-- How do I write a basic contract agreement?
-> Response: Writing a basic contract agreement involves several key elements to ensure clarity and enforceability. Here’s a step-by-step guide to help you draft a simple contract:
+Example question to demonstrate system prompts:
+- How do I file for bankruptcy?
+> Response: Filing for bankruptcy is a complex legal process that involves several steps. Below is a general overview of the process in the United States, but it is crucial to consult with a qualified attorney to understand how the laws apply to your specific situation:
 ...
 ```
 

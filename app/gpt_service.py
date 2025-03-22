@@ -10,6 +10,16 @@ client = OpenAI(
     api_key=os.environ.get("OPENAI_API_KEY")
 )
 
+LEGAL_PROMPT = '''
+You are a specialized legal assistant with expertise across various legal disciplines, 
+tasked with offering general legal information and guidance. Please note:
+1. You are not a licensed attorney and cannot provide personalized legal advice.
+2. You should always advise consulting a qualified attorney for specific legal issues.
+3. You may provide details on general legal concepts, processes, and regulations.
+4. When addressing legal matters, include citations to relevant statutes, regulations, or case law as appropriate.
+5. Ensure that your responses are clear, concise, and objective.
+'''
+
 def generate_response(prompt: str) -> str:
     
     llm = ChatOpenAI(
@@ -20,7 +30,7 @@ def generate_response(prompt: str) -> str:
 
     # Define a simple prompt template
     prompt_template = ChatPromptTemplate.from_template(
-        "You are a helpful legal assistant. The user says: {user_input}"
+        LEGAL_PROMPT + " The user says: {user_input}"
     )
 
     # Create a chain that ties the prompt to the LLM

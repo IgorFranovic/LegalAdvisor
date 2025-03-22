@@ -1,0 +1,29 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:13
+    restart: always
+    env_file:
+      - .env  # Ensures the environment variables from .env are loaded
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB} || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    env_file:
+      - .env
+    depends_on:
+      - db  # ensure DB is up before starting the app
+    command: python app/main.py
+    volumes:
+      - .:/app 
+
+volumes:
+  pgdata:

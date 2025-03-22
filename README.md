@@ -4,8 +4,10 @@ This is a simple legal advisor chatbot application that uses LLM integration
 
 ## Features
 
-- Integrates with OpenAI's GPT-4o model
-- Sends a hardcoded prompt and prints the response to the terminal
+- LLM Integration: Uses OpenAI’s GPT-4o model (or your choice of model)
+- Postgres Database: Stores conversations in the "conversations" table
+- Docker-Compose: Spin up the entire stack (app + database) with one command
+- Automatic Table Creation: Creates the table on startup if it doesn’t exist
 - Lays the foundation for a legal assistant chatbot
 
 ## Project Structure
@@ -13,27 +15,26 @@ This is a simple legal advisor chatbot application that uses LLM integration
 ```
 app/
 ├── main.py           # Entry point – sends a sample prompt to GPT
+├── database.py       # Sets up SQLAlchemy engine & session
+├── models.py         # Defines models used in the application
 └── gpt_service.py    # Handles OpenAI API communication
-.env                  # Stores the OPENAI_API_KEY (not committed to Git)
+.env                  # Environment variables (not committed to Git)
 .env.example          # Example .env structure
+docker-compose.yml    # Defines the postgress container and app service
+Dockerfile            # Builds a Python 3.9-slim image with dependencies
+requirements.txt      # Python dependencies
 ```
 
-## Setup
+## Docker Setup:
 
 1. Clone the repository.
-2. Create a `.env` file in the root with your OpenAI API key:
-   ```
-   OPENAI_API_KEY=your-key-here
-   ```
-3. Install dependencies:
-   ```bash
-   pip install openai python-dotenv
-   ```
-4. Run the app:
-   ```bash
-   python app/main.py
-   ```
+2. Create a `.env` file in the root with as shown in ```.env.example```   
+3. Build and run using Docker Compose: ```docker-compose up --build``` \
+   This starts a Postgres container and the app service
 
+Verifying Postgres Data:
+
+The Postgres container data is stored in a named volume called pgdata, so your data persists even if the container restarts. You can connect to the database (for example, via psql or a GUI tool) using: Host: localhost Port: 5433
 ---
 
 ## Example Output
@@ -42,3 +43,4 @@ app/
 Response to: Hello, how are you?
 > I'm doing well, thank you! How can I assist you with your legal questions today?
 ```
+A new row will appear in the "conversations" table.

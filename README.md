@@ -10,6 +10,7 @@ This is a simple legal advisor chatbot application that uses LLM integration
 - Automatic Table Creation: Creates the table on startup if it doesn’t exist
 - Provides a FastAPI implementation
 - Provides a Streamlit-based UI that lets users send prompts and receive GPT-generated responses
+- Uses LangChain's prompt templates for the legal advisor context
 
 
 ## Project Structure
@@ -19,7 +20,7 @@ app/
 ├── main.py           # Initializes the database, sets up the FastAPI app, and includes the ‘chat’ router.
 ├── database.py       # Sets up SQLAlchemy engine & session
 ├── models.py         # Defines models used in the application
-├── gpt_service.py    # Handles OpenAI API communication
+├── gpt_service.py    # Handles OpenAI API communication, uses Langchain
 ├── streamlit_app.py  # Handles Streamlit logic
 └── routers/
     └── chat.py       # Endpoints
@@ -45,19 +46,12 @@ The Postgres container data is stored in a named volume called pgdata, so your d
 ## Example Usage
 
 Once you start the app with ```docker-compose up --build``` an instance of Streamlit will run on localhost:8501.
-It communicates with the GPT service and the database through FastAPI calls.
-You can send prompts and receive GPT generated responses.
+It utilizes Langchain to communicate with the GPT model.
 
 ```
-Response to:
-- What does it take to open up a law firm?
-> Response: Starting a law firm involves several key steps and considerations:
-
-Research and Planning:
-
-Identify your practice area(s).
-Research local market conditions and competition.
-Develop a business plan detailing services, target clients, marketing strategy, financial projections, and growth plans.
+Example question:
+- How do I write a basic contract agreement?
+> Response: Writing a basic contract agreement involves several key elements to ensure clarity and enforceability. Here’s a step-by-step guide to help you draft a simple contract:
 ...
 ```
 

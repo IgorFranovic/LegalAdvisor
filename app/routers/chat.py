@@ -1,3 +1,4 @@
+#app/routers/chat.py
 from fastapi import APIRouter
 from pydantic import BaseModel
 from app.gpt_service import generate_response

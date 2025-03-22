@@ -11,19 +11,21 @@ services:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB} || exit 1"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
+      interval: 2s
+      timeout: 2s
+      retries: 3
 
-  app:
-    build: .
-    env_file:
-      - .env
+  fastapi:
+    build:
+      context: .
+      dockerfile: Dockerfile.fastapi
     depends_on:
-      - db  # ensure DB is up before starting the app
-    command: python app/main.py
-    volumes:
-      - .:/app 
+      db:
+        condition: service_healthy
+    env_file:
+      - .env  # Ensure the FastAPI service gets the correct credentials
+    ports:
+      - "8000:8000"
 
 volumes:
   pgdata:

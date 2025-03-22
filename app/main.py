@@ -1,27 +1,15 @@
 #app/main.py
+from fastapi import FastAPI
+from app.database import engine
+from app.models import Base
+from app.routers import chat
 
-from gpt_service import generate_response
-from database import SessionLocal, engine
-from models import Base, Conversation
+# Create all tables
+Base.metadata.create_all(bind=engine)
 
+# Create the FastAPI instance
+app = FastAPI()
 
-def init_db():
-    Base.metadata.create_all(bind=engine)  # Create all tables
+# Include "chat" router
+app.include_router(chat.router, tags=["chat"])
 
-
-if __name__ == "__main__":
-
-    # Create tables on startup
-    init_db()
-
-    user_input = "Hello, how are you?"
-    response_text = generate_response(user_input)
-    print(response_text)
-
-    
-    db = SessionLocal()
-    convo = Conversation(question=user_input, response=response_text)
-    db.add(convo)
-    db.commit()
-    db.refresh(convo)
-    db.close()

@@ -8,20 +8,23 @@ This is a simple legal advisor chatbot application that uses LLM integration
 - Postgres Database: Stores conversations in the "conversations" table
 - Docker-Compose: Spin up the entire stack (app + database) with one command
 - Automatic Table Creation: Creates the table on startup if it doesn’t exist
-- Lays the foundation for a legal assistant chatbot
+- Provides a FastAPI implementation
+
 
 ## Project Structure
 
 ```
 app/
-├── main.py           # Entry point – sends a sample prompt to GPT
+├── main.py           # Initializes the database, sets up the FastAPI app, and includes the ‘chat’ router.
 ├── database.py       # Sets up SQLAlchemy engine & session
 ├── models.py         # Defines models used in the application
-└── gpt_service.py    # Handles OpenAI API communication
+├── gpt_service.py    # Handles OpenAI API communication
+└── routers/
+    └── chat.py       # Endpoints
 .env                  # Environment variables (not committed to Git)
 .env.example          # Example .env structure
 docker-compose.yml    # Defines the postgress container and app service
-Dockerfile            # Builds a Python 3.9-slim image with dependencies
+Dockerfile.fastapi    # Builds a minimal Docker image for the FastAPI application
 requirements.txt      # Python dependencies
 ```
 
@@ -35,12 +38,17 @@ requirements.txt      # Python dependencies
 Verifying Postgres Data:
 
 The Postgres container data is stored in a named volume called pgdata, so your data persists even if the container restarts. You can connect to the database (for example, via psql or a GUI tool) using: Host: localhost Port: 5433
----
 
 ## Example Output
 
+Once you start the app with ```docker-compose up --build``` an instance of FastAPI will run on localhost:8000.
+You can target the ```/chat``` endpoint with Postman (or similar tools). Pass a json in a post request body containing a string "prompt".
+
 ```
-Response to: Hello, how are you?
-> I'm doing well, thank you! How can I assist you with your legal questions today?
+Response to:
+{
+    "prompt": "Hello from Postman, how are you?"
+}
+> "Hello! I'm here to help. How can I assist you today?"
 ```
 A new row will appear in the "conversations" table.

@@ -49,17 +49,18 @@ requirements.txt             # Python dependencies
 
 Verifying Postgres Data:
 
-The Postgres container data is stored in a named volume called pgdata, so the data persists even if the container restarts. You can connect to the database (for example, via psql or a GUI tool) using: \ 
-`Host: localhost` \ 
-`Port: 5433` \
-And the database name, user, password from your `.env` file.
+The Postgres container data is stored in a named volume called pgdata, so the data persists even if the container restarts. You can connect to the database (for example, via psql or a GUI tool) using: 
+Host: `localhost` 
+Port: `5433` 
+Copy the database name, user, password from your `.env` file.
 
 If you want to remove the data, use: `docker-compose down -v`
 
 ## Example Usage
 
-Once you start the app with ```docker-compose up --build``` an instance of Streamlit will run on ```localhost:8501```.
+Once you start the app with ```docker-compose up --build```, an instance of Streamlit will run on ```localhost:8501```.
 Navigate to the URL to interact with the app.
+
 Ask questions using the prompt field on the bottom.
 Navigate through previous conversations using the sidemenu on the left.
 

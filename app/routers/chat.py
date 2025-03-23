@@ -101,8 +101,8 @@ def get_sessions():
         ).order_by(Conversation.created_at.asc()).first()
         
         if first_message:
-            # Create a preview from the first question (limited to 30 chars)
-            preview = first_message.question[:30] + "..." if len(first_message.question) > 30 else first_message.question
+            # Create a preview from the first question (limited to 150 chars)
+            preview = first_message.question[:150] + "..." if len(first_message.question) > 150 else first_message.question
             
             # Format created_at as a string
             created_at = session.created_at.strftime("%Y-%m-%d %H:%M")

@@ -54,12 +54,43 @@ def fetch_sessions():
 # Refresh sessions list
 st.session_state.sessions_list = fetch_sessions()
 
+# Add custom CSS for formatting with reduced spacing
+st.markdown("""
+<style>
+    /* Date display (above recent conversation buttons)*/
+    .small-date {
+        font-size: 0.7rem;
+        color: #888;
+        text-align: right;
+        display: block;
+        margin-bottom: 2px;
+        margin-top: 10px;
+    }
+
+    /* Add truncation for long text */
+    .truncate-text {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+        display: inline-block;
+    }
+
+    /* Reduce vertical spacing between buttons */
+    .stButton {
+        margin-top: 0px !important;
+        margin-bottom: 0px !important;
+    }
+</style>
+""", unsafe_allow_html=True)
+
 # Sidebar for chat navigation
 with st.sidebar:
     st.title("Conversations")
     
-    # New chat button at the top of sidebar
-    if st.button("+ New Conversation", use_container_width=True):
+    
+    # Handle the button click event
+    if st.button("New Conversation", key="new_conv_button", use_container_width=True):
         start_new_conversation()
     
     st.divider()
@@ -68,26 +99,44 @@ with st.sidebar:
     if st.session_state.sessions_list:
         st.subheader("Recent Conversations")
         
-        # For each session, create a clickable button with preview text
+        # For each session, create a column layout with buttons
         for session in st.session_state.sessions_list:
-            # Format the session preview with creation date and preview text
-            label = f"{session['created_at']} - {session['preview']}"
+            # Extract preview (question) and date
+            preview = session['preview']
+            date_str = session['created_at']
+            
+            # Truncate preview if too long
+            display_preview = preview[:30] + "..." if len(preview) > 40 else preview
             
             # Highlight current session
             button_type = "primary" if session['session_id'] == st.session_state.session_id else "secondary"
             
-            # Create a button for each conversation
-            if st.button(
-                label, 
-                key=f"session_{session['session_id']}", 
-                use_container_width=True,
-                type=button_type
-            ):
-                load_conversation(session['session_id'])
+            # Create a container for this session
+            session_container = st.container()
+            with session_container:
+
+
+                 # Add the date above the button
+                st.markdown(f'<div class="small-date">{date_str}</div>', unsafe_allow_html=True)
+
+                # Create a tooltip for the button
+                tooltip = preview  # Full text as tooltip
+                
+                # Create a button with truncated question text
+                if st.button(
+                    f"**{display_preview}**", 
+                    key=f"session_{session['session_id']}", 
+                    use_container_width=True,
+                    type=button_type,
+                    help=tooltip
+                ):
+                    load_conversation(session['session_id'])
+                
+               
     else:
         st.info("No previous conversations")
 
-# Main area for the chat interface
+# Main title
 st.title("Chat with a legal advisor")
 
 # Create a scrollable container for the chat messages

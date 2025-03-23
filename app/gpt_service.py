@@ -4,6 +4,8 @@ import os
 from openai import OpenAI
 from langchain_openai import ChatOpenAI
 from langchain.prompts import ChatPromptTemplate
+from langchain.memory import ConversationBufferMemory
+from langchain.chains import ConversationChain
 
 client = OpenAI(
     api_key=os.environ.get("OPENAI_API_KEY")
@@ -18,8 +20,17 @@ tasked with offering general legal information and guidance. Please note:
 4. When addressing legal matters, include citations to relevant statutes, regulations, or case law as appropriate.
 5. Ensure that your responses are clear, concise, and objective.
 '''
+# Create a dictionary to store memory objects by session_id
+memory_store = {}
 
-def generate_response(prompt: str) -> str:
+def get_memory(session_id):
+    """Retrieve or create a memory object for a session"""
+    if session_id not in memory_store:
+        memory_store[session_id] = ConversationBufferMemory()
+    return memory_store[session_id]
+
+def generate_response(prompt: str, session_id: str = "default") -> str:
+    """Generate a response using LangChain's conversation memory"""
     
     llm = ChatOpenAI(
         api_key=os.environ.get("OPENAI_API_KEY"),
@@ -27,19 +38,23 @@ def generate_response(prompt: str) -> str:
         temperature=0.7
     )
 
-    # Define a simple prompt template
-    prompt_template = ChatPromptTemplate.from_template(
-        LEGAL_PROMPT + " The user says: {user_input}"
+    # Get or create memory for this session
+    memory = get_memory(session_id)
+    
+    # Create a conversation chain with memory
+    conversation = ConversationChain(
+        llm=llm,
+        memory=memory,
+        verbose=False
     )
-
-    # Create a chain using the pipe operator
-    chain = prompt_template | llm
     
-    # Run the chain with the user's prompt using invoke
-    response = chain.invoke({"user_input": prompt})
+    # Add the legal prompt context to the user input
+    full_prompt = f"{LEGAL_PROMPT}\n\nUser: {prompt}"
     
-    # Extract the content from the response
-    return response.content.strip()
+    # Generate response
+    response = conversation.predict(input=full_prompt)
+    
+    return response.strip()
 
 # Direct OpenAI API call
 def generate_response_direct(prompt: str) -> str:

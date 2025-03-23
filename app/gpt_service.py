@@ -2,9 +2,8 @@
 
 import os
 from openai import OpenAI
-from langchain.chat_models import ChatOpenAI
+from langchain_openai import ChatOpenAI
 from langchain.prompts import ChatPromptTemplate
-from langchain.chains import LLMChain
 
 client = OpenAI(
     api_key=os.environ.get("OPENAI_API_KEY")
@@ -23,7 +22,7 @@ tasked with offering general legal information and guidance. Please note:
 def generate_response(prompt: str) -> str:
     
     llm = ChatOpenAI(
-        openai_api_key=os.environ.get("OPENAI_API_KEY"),
+        api_key=os.environ.get("OPENAI_API_KEY"),
         model_name="gpt-4o",  
         temperature=0.7
     )
@@ -33,12 +32,14 @@ def generate_response(prompt: str) -> str:
         LEGAL_PROMPT + " The user says: {user_input}"
     )
 
-    # Create a chain that ties the prompt to the LLM
-    chain = LLMChain(llm=llm, prompt=prompt_template)
-
-    # Run the chain with the user's prompt
-    output = chain.run({"user_input": prompt})
-    return output.strip()
+    # Create a chain using the pipe operator
+    chain = prompt_template | llm
+    
+    # Run the chain with the user's prompt using invoke
+    response = chain.invoke({"user_input": prompt})
+    
+    # Extract the content from the response
+    return response.content.strip()
 
 # Direct OpenAI API call
 def generate_response_direct(prompt: str) -> str:

@@ -11,7 +11,7 @@ This is a simple legal advisor chatbot application that uses LLM integration
 - Provides a FastAPI implementation
 - Provides a Streamlit-based UI that lets users send prompts and receive GPT-generated responses
 - Uses LangChain's prompt templates for the legal advisor context
-
+- Uses LangChain to maintain context between prompts
 
 ## Project Structure
 
@@ -46,7 +46,9 @@ The Postgres container data is stored in a named volume called pgdata, so your d
 ## Example Usage
 
 Once you start the app with ```docker-compose up --build``` an instance of Streamlit will run on localhost:8501.
-It utilizes Langchain to communicate with the GPT model.
+It utilizes Langchain to communicate with the GPT model, maintaining context between messages.
+
+The 'New Chat' button creates a fresh session, removing any memory from the previous conversation.
 
 ```
 Example question to demonstrate system prompts:

@@ -1,4 +1,4 @@
-#app/gpt_service.py
+#app/langchain/gpt_service.py
 
 import os
 from openai import OpenAI

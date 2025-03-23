@@ -1,8 +1,8 @@
 #app/main.py
 from fastapi import FastAPI
-from app.database import engine
-from app.models import Base
-from app.routers import chat
+from app.data.database import engine
+from app.data.models import Base
+from app.fastapi_routers import chat
 
 # Create all tables
 Base.metadata.create_all(bind=engine)

@@ -1,9 +1,9 @@
 #app/routers/chat.py
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
-from app.gpt_service import generate_response, reset_conversation
-from app.database import SessionLocal
-from app.models import Conversation, ConversationSession
+from app.langchain.gpt_service import generate_response, reset_conversation
+from app.data.database import SessionLocal
+from app.data.models import Conversation, ConversationSession
 from typing import Optional, List, Dict, Any
 from sqlalchemy.orm import Session
 from datetime import datetime

@@ -1,9 +1,9 @@
-#app/streamlit_app.py
+#app/streamlit/streamlit_app.py
 import streamlit as st
 import requests
 import uuid
 import datetime
-
+import os
 # Initialize session state for conversation history if it doesn't exist
 if "session_id" not in st.session_state:
     st.session_state.session_id = str(uuid.uuid4())
@@ -51,38 +51,21 @@ def fetch_sessions():
         return response.json()["sessions"]
     return []
 
+
+import os
+
+def load_css(file_name):
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    css_path = os.path.join(script_dir, file_name)
+    with open(css_path) as f:
+        st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
+
+# Load CSS
+load_css('styles/style.css')
+
 # Refresh sessions list
 st.session_state.sessions_list = fetch_sessions()
 
-# Add custom CSS for formatting with reduced spacing
-st.markdown("""
-<style>
-    /* Date display (above recent conversation buttons)*/
-    .small-date {
-        font-size: 0.7rem;
-        color: #888;
-        text-align: right;
-        display: block;
-        margin-bottom: 2px;
-        margin-top: 10px;
-    }
-
-    /* Add truncation for long text */
-    .truncate-text {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: 100%;
-        display: inline-block;
-    }
-
-    /* Reduce vertical spacing between buttons */
-    .stButton {
-        margin-top: 0px !important;
-        margin-bottom: 0px !important;
-    }
-</style>
-""", unsafe_allow_html=True)
 
 # Sidebar for chat navigation
 with st.sidebar:
@@ -106,7 +89,7 @@ with st.sidebar:
             date_str = session['created_at']
             
             # Truncate preview if too long
-            display_preview = preview[:30] + "..." if len(preview) > 40 else preview
+            display_preview = preview[:25] + "..." if len(preview) > 25 else preview
             
             # Highlight current session
             button_type = "primary" if session['session_id'] == st.session_state.session_id else "secondary"

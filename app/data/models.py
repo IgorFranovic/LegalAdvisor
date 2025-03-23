@@ -1,4 +1,4 @@
-# app/models.py
+# app/data/models.py
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
@@ -22,7 +22,7 @@ class ConversationSession(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     session_id = Column(String, unique=True, index=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    last_updated = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.now)
+    last_updated = Column(DateTime, default=datetime.now, onupdate=datetime.now)
     
     messages = relationship("Conversation", back_populates="session")

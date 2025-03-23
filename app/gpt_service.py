@@ -3,10 +3,10 @@
 import os
 from openai import OpenAI
 from langchain_openai import ChatOpenAI
-from langchain.prompts import ChatPromptTemplate
-from langchain.memory import ConversationBufferMemory
-from langchain.chains import ConversationChain
+from langchain_community.chat_message_histories import ChatMessageHistory
+from langchain.schema import SystemMessage, HumanMessage, AIMessage
 
+# for the direct openai api call
 client = OpenAI(
     api_key=os.environ.get("OPENAI_API_KEY")
 )
@@ -20,17 +20,17 @@ tasked with offering general legal information and guidance. Please note:
 4. When addressing legal matters, include citations to relevant statutes, regulations, or case law as appropriate.
 5. Ensure that your responses are clear, concise, and objective.
 '''
-# Create a dictionary to store memory objects by session_id
-memory_store = {}
+# Create a dictionary to store message history objects by session_id
+history_store = {}
 
-def get_memory(session_id):
-    """Retrieve or create a memory object for a session"""
-    if session_id not in memory_store:
-        memory_store[session_id] = ConversationBufferMemory()
-    return memory_store[session_id]
+def get_message_history(session_id):
+    """Retrieve or create a message history object for a session"""
+    if session_id not in history_store:
+        history_store[session_id] = ChatMessageHistory()
+    return history_store[session_id]
 
 def generate_response(prompt: str, session_id: str = "default") -> str:
-    """Generate a response using LangChain's conversation memory"""
+    """Generate a response using LangChain and message history"""
     
     llm = ChatOpenAI(
         api_key=os.environ.get("OPENAI_API_KEY"),
@@ -38,23 +38,31 @@ def generate_response(prompt: str, session_id: str = "default") -> str:
         temperature=0.7
     )
 
-    # Get or create memory for this session
-    memory = get_memory(session_id)
+    # Get message history for this session
+    message_history = get_message_history(session_id)
     
-    # Create a conversation chain with memory
-    conversation = ConversationChain(
-        llm=llm,
-        memory=memory,
-        verbose=False
-    )
+    # Create message list, starting with system message
+    messages = [SystemMessage(content=LEGAL_PROMPT)]
     
-    # Add the legal prompt context to the user input
-    full_prompt = f"{LEGAL_PROMPT}\n\nUser: {prompt}"
+    # Add chat history
+    messages.extend(message_history.messages)
     
-    # Generate response
-    response = conversation.predict(input=full_prompt)
+    # Add the new user message
+    messages.append(HumanMessage(content=prompt))
     
-    return response.strip()
+    # Generate response directly with the LLM
+    response = llm.invoke(messages)
+    
+    # Update message history with the new exchange
+    message_history.add_user_message(prompt)
+    message_history.add_ai_message(response.content)
+    
+    return response.content.strip()
+
+def reset_conversation(session_id: str):
+    """Clear the conversation history for a given session"""
+    if session_id in history_store:
+        del history_store[session_id]
 
 # Direct OpenAI API call
 def generate_response_direct(prompt: str) -> str:
@@ -64,5 +72,3 @@ def generate_response_direct(prompt: str) -> str:
         input=prompt,
     )
     return response.output_text.strip()
-
-

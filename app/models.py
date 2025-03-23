@@ -11,9 +11,9 @@ class Conversation(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     question = Column(String, nullable=False)
-    response = Column(String, nullable=False)
     created_at = Column(DateTime, default=datetime.now)
     session_id = Column(Integer, ForeignKey("conversation_sessions.id"))
+    response = Column(String, nullable=False)
 
     session = relationship("ConversationSession", back_populates="messages")
 

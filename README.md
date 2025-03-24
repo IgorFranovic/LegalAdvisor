@@ -199,3 +199,30 @@ Detailed API documentation is available at http://localhost:8000/docs when the a
 
 ## App Screenshot
 ![image](https://github.com/user-attachments/assets/b0fe35cc-fcc2-4b7c-99ce-ca09c6e7f86b)
+
+
+## Challenges and Solutions
+
+### Challenge 1: Context Management
+
+**Problem**: Maintaining conversation context between user messages.
+
+**Solution**: Implemented LangChain's `ChatMessageHistory` to store and retrieve message history by session ID, allowing the model to reference previous exchanges.
+
+### Challenge 2: Concurrent Sessions
+
+**Problem**: Supporting multiple user sessions with isolated conversation histories.
+
+**Solution**: Created a session management system that stores conversations in the database with unique session IDs and provides a UI to navigate between different conversation threads.
+
+### Challenge 3: Legal Domain Specialization
+
+**Problem**: Ensuring the AI provides appropriate legal information without crossing into unauthorized practice of law.
+
+**Solution**: Developed a specialized system prompt with clear boundaries, disclaimers, and ethical guidelines that frames the AI as an informational resource rather than a substitute for legal counsel.
+
+### Challenge 4: Docker Networking
+
+**Problem**: Ensuring proper communication between containers.
+
+**Solution**: Configured the Docker network to allow the Streamlit container to communicate with the FastAPI container using service names as hostnames (e.g., `http://fastapi:8000`).

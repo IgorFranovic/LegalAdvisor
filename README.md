@@ -1,79 +1,189 @@
 # LegalAdvisor
-This is a simple legal advisor chatbot application that uses LLM integration
 
+A legal advisor chatbot application that leverages OpenAI's GPT-4o model to provide general legal information and guidance through a user-friendly interface.
 
 ## Features
 
-- LLM Integration: Uses OpenAI’s GPT-4o model (or model of your choice)
-- Stores conversations and sessions in a PostgreSQL database
-- Docker integration: Spin up the entire stack (PostgreSQL Database, FastAPI API, Streamlit UI) with one command
-- Provides a FastAPI implementation
-- Provides a Streamlit-based UI that lets users send prompts and receive GPT-generated responses
-- Uses LangChain's prompt templates for the legal advisor context
-- Uses LangChain to maintain context between prompts
-- Keeps track of conversation history (option to continue old conversations with context)
+- **LLM Integration**: Uses OpenAI's GPT-4o model through LangChain
+- **Persistent Storage**: Stores conversations and sessions in a PostgreSQL database
+- **Docker Integration**: Easily deploy the entire stack (PostgreSQL, FastAPI, Streamlit) with one command
+- **RESTful API**: FastAPI implementation for all backend operations
+- **User-Friendly UI**: Streamlit-based interface for interacting with the chatbot
+- **Context-Aware**: Maintains conversation history between prompts using LangChain
+- **Session Management**: Ability to continue old conversations with full context
 
-## Project Structure
+## Project Architecture
+
+The application follows a three-tier architecture:
+
+```
+LegalAdvisor
+├── Database Layer (PostgreSQL)
+├── Backend Layer (FastAPI + LangChain)
+└── Frontend Layer (Streamlit)
+```
+
+### Directory Structure
 
 ```
 app/
-├── main.py                  # Initializes the database, sets up the FastAPI app, and includes the ‘chat’ router.
+├── main.py                  # FastAPI app initialization and database setup
 ├── data/
-|    ├── database.py         # Sets up SQLAlchemy engine & session  
-|    └── models.py           # Defines models used in the application             
+|    ├── database.py         # SQLAlchemy engine & session configuration  
+|    └── models.py           # Database models for conversations and sessions             
 ├── fastapi_routers/
-|    └── chat.py             # FastAPI endpoints  
+|    └── chat.py             # API endpoints for chat functionality 
 ├── langchain/
-|    └── gpt_service.py      # Handles OpenAI and Langchain logic 
+|    └── gpt_service.py      # LLM integration with OpenAI and conversation management 
 └── streamlit/
-     ├── streamlit_app.py    # Handles Streamlit logic  
+     ├── streamlit_app.py    # Streamlit UI application 
      └── styles/              
-          └── style.css      # CSS classes for Streamlit UI 
+          └── style.css      # CSS styling for Streamlit UI 
 
 .env                         # Environment variables (not committed to Git)
-.env.example                 # Example .env structure
-docker-compose.yml           # Defines the postgress container and app service
-Dockerfile.fastapi           # Builds a minimal Docker image for the FastAPI application
-Dockerfile.streamlit         # Builds a Docker image for running the Streamlit UI
+.env.example                 # Example environment variable template
+docker-compose.yml           # Docker services configuration
+Dockerfile.fastapi           # Docker image for FastAPI service
+Dockerfile.streamlit         # Docker image for Streamlit service
 requirements.txt             # Python dependencies
 ```
 
-## Docker Setup:
+## Legal Advisor Context Approach
 
-1. Clone the repository.
-2. Create a `.env` file in the root with as shown in ```.env.example```   
-3. Replace `OPENAI_API_KEY` value with a valid one.
-4. You can leave the Postgre user, password and database name as is.
-5. Build and run using Docker Compose: ```docker-compose up --build``` \
-   This starts a Postgres container, launches FastAPI on `localhost:8000` and launches Streamlit on `localhost:8501`
+The application uses a specialized system prompt (defined in `gpt_service.py`) that:
 
-Verifying Postgres Data:
+1. Establishes the assistant as a legal information provider, not a licensed attorney
+2. Sets clear boundaries on what types of legal information can be provided
+3. Requires disclaimers and attorney consultation recommendations
+4. Enforces ethical guidelines to prevent misuse
+5. Includes safeguards against prompt injection attempts
 
-The Postgres container data is stored in a named volume called pgdata, so the data persists even if the container restarts. You can connect to the database (for example, via psql or a GUI tool) using: 
-Host: `localhost` 
-Port: `5433` 
-Copy the database name, user, password from your `.env` file.
+The system ensures that responses:
+- Include citations to relevant laws where appropriate
+- Remain objective and informational
+- Advise users to consult qualified attorneys for specific cases
+- Refuse requests for drafting legal documents or circumventing regulations
 
-If you want to remove the data, use: `docker-compose down -v`
+## Setup and Running Instructions
 
-## Example Usage
+### Prerequisites
 
-Once you start the app with ```docker-compose up --build```, an instance of Streamlit will run on ```localhost:8501```.
-Navigate to the URL to interact with the app.
+- Docker and Docker Compose installed on your system
+- An OpenAI API key with access to the GPT-4o model
 
-Ask questions using the prompt field on the bottom.
-Navigate through previous conversations using the sidemenu on the left.
+### Step-by-Step Setup
 
-The `'New Conversation'` button creates a fresh session, not keeping any context from the previous one.
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/IgorFranovic/LegalAdvisor.git
+   cd LegalAdvisor
+   ```
 
+2. **Create environment variables file**
+   
+   Copy the example environment file and edit it:
+   ```bash
+   cp .env.example .env
+   ```
 
+3. **Add your OpenAI API key**
+   
+   Edit the `.env` file and replace `your-key-here` with your actual OpenAI API key:
+   ```
+   OPENAI_API_KEY=sk-your-actual-api-key
+   ```
+   
+   Note: You can keep the PostgreSQL credentials as they are for local development.
+
+4. **Build and start the application**
+   
+   ```bash
+   docker-compose up --build
+   ```
+   
+   This command:
+   - Builds Docker images for FastAPI and Streamlit
+   - Creates and configures a PostgreSQL database
+   - Starts all three services with proper networking
+
+5. **Access the application**
+   
+   - Streamlit frontend: http://localhost:8501
+   - FastAPI backend: http://localhost:8000
+   - API documentation: http://localhost:8000/docs
+
+### Running Services Individually
+
+If you need to run services separately for development or troubleshooting:
+
+#### Database Only
+
+```bash
+docker-compose up db
 ```
-Example question to demonstrate system prompts:
-- How do I file for bankruptcy?
-> Response: Filing for bankruptcy is a complex legal process that involves several steps. Below is a general overview of the process in the United States, but it is crucial to consult with a qualified attorney to understand how the laws apply to your specific situation:
-...
+
+#### FastAPI Backend Only
+
+Ensure the database is running first, then:
+
+```bash
+docker-compose up fastapi
 ```
 
+#### Streamlit Frontend Only
 
-A new row will appear in the `conversations` table for each prompt. 
-If a new session is started, a new row will appear in the `conversation_sessions` table.
+Ensure the FastAPI service is running first, then:
+
+```bash
+docker-compose up streamlit
+```
+
+## Database Management
+
+### Connecting to PostgreSQL
+
+You can connect to the PostgreSQL database using a client tool (e.g., pgAdmin, DBeaver) with:
+
+- Host: `localhost`
+- Port: `5433` (Note: mapped from standard 5432 to avoid conflicts)
+- Database: Value of `POSTGRES_DB` in your `.env` file
+- Username: Value of `POSTGRES_USER` in your `.env` file
+- Password: Value of `POSTGRES_PASSWORD` in your `.env` file
+
+### Persistent Data
+
+- Database data is stored in a named Docker volume `pgdata` for persistence
+- To completely reset the database: `docker-compose down -v`
+
+## Usage Guide
+
+1. Navigate to http://localhost:8501 in your web browser
+2. Type your legal question in the input field at the bottom
+3. Receive AI-generated legal information based on your query
+4. View previous conversations in the sidebar
+5. Create a new conversation by clicking "New Conversation"
+
+Example questions to try:
+- "How do I file for bankruptcy?"
+- "What are the steps to register a trademark?"
+- "What is the difference between a will and a trust?"
+
+
+## API Documentation
+
+The FastAPI backend exposes the following endpoints:
+
+- `POST /chat`: Send a message and receive a response
+- `GET /chat-history/{session_id}`: Retrieve conversation history for a session
+- `GET /sessions`: List all conversation sessions
+- `POST /reset`: Reset a conversation session
+
+Detailed API documentation is available at http://localhost:8000/docs when the application is running.
+
+## Future Improvements
+
+- Add user authentication
+- Implement rate limiting
+- Add support for document upload and analysis
+- Expand the system prompt with more specialized legal domains
+- Add unit and integration tests

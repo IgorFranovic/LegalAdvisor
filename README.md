@@ -195,3 +195,7 @@ Detailed API documentation is available at http://localhost:8000/docs when the a
 - Add support for document upload and analysis
 - Expand the system prompt with more specialized legal domains
 - Add unit and integration tests
+
+
+## App Screenshot
+![image](https://github.com/user-attachments/assets/b0fe35cc-fcc2-4b7c-99ce-ca09c6e7f86b)

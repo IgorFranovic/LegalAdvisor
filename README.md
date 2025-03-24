@@ -103,6 +103,7 @@ The system ensures that responses:
    Note: You can keep the PostgreSQL credentials as they are for local development.
 
 4. **Build and start the application**
+
    With Docker service up, run:
    ```bash
    docker-compose up --build

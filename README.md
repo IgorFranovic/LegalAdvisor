@@ -81,9 +81,16 @@ The system ensures that responses:
 
 2. **Create environment variables file**
    
-   Copy the example environment file and edit it:
+   Choose the command based on your operating system:
+
+   **Linux/macOS:**
    ```bash
    cp .env.example .env
+   ```
+
+   **Windows (Command Prompt):**
+   ```cmd
+   copy .env.example .env
    ```
 
 3. **Add your OpenAI API key**
@@ -96,7 +103,7 @@ The system ensures that responses:
    Note: You can keep the PostgreSQL credentials as they are for local development.
 
 4. **Build and start the application**
-   
+   With Docker service up, run:
    ```bash
    docker-compose up --build
    ```
